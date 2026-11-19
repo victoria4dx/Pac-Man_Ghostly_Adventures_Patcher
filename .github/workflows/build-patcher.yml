@@ -1,0 +1,40 @@
+name: PAC-MAN patcher (Windows exe)
+
+on:
+  push:
+    branches: [pacman-patcher]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyInstaller
+        run: python -m pip install pyinstaller==6.11.1
+
+      - name: GUI self-test (source)
+        run: python pacman_patcher_gui.py --selftest
+
+      - name: Build exe
+        run: pyinstaller --onefile --windowed --name PacManPatcher pacman_patcher_gui.py
+
+      - name: GUI self-test (packaged exe)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist\PacManPatcher.exe -ArgumentList '--selftest' -PassThru
+          if (-not $p.WaitForExit(120000)) { $p.Kill(); throw "self-test timed out" }
+          if ($p.ExitCode -ne 0) { throw "self-test failed with exit code $($p.ExitCode)" }
+          Get-Item dist\PacManPatcher.exe | Format-List Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PacManPatcher
+          path: dist/PacManPatcher.exe
+          if-no-files-found: error
