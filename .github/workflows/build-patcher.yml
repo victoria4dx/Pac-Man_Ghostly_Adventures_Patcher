@@ -2,7 +2,7 @@ name: PAC-MAN patcher (Windows exe)
 
 on:
   push:
-    branches: [pacman-patcher]
+    branches: [main]
   workflow_dispatch:
 
 jobs:

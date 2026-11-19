@@ -13,4 +13,5 @@ window `Left` position in the registry.
 - `asm/horplus2.asm`: source of the camera FOV routine placed in unused space in `.text`
   (assemble with `nasm -f bin`).
 
-The Actions workflow builds `PacManPatcher.exe` with PyInstaller on every push.
+The Actions workflow builds `PacManPatcher.exe` with PyInstaller on every push to `main`;
+download it from the run's Artifacts section.
