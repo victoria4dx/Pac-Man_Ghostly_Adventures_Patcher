@@ -185,12 +185,12 @@ class App(ttk.Frame):
         for w in (self.apply_btn, self.restore_btn):
             w.state(["!disabled"] if on else ["disabled"])
 
-    def _options(self):
+    def _collect_options(self):
         return core.Options(fps=self.fps_var.get(), borderless=self.borderless_var.get(),
                             vsync=self.vsync_var.get(), hires_fix=self.hires_var.get(),
                             hor_plus=self.horplus_var.get(), fov_scale=round(self.fov_var.get()) / 100.0)
 
-    def _show(self, o):
+    def _show_options(self, o):
         self.fps_var.set(o.fps)
         self.borderless_var.set(o.borderless)
         self.vsync_var.set(o.vsync)
@@ -224,7 +224,7 @@ class App(ttk.Frame):
         except OSError as e:
             self.status_var.set("Could not read the file: %s" % e)
             return
-        self._show(opts)
+        self._show_options(opts)
         self.loaded = True
         self._set_enabled(True)
         self.status_var.set("Supported build. Current state: %s." % ("patched" if data != base else "original"))
@@ -241,7 +241,7 @@ class App(ttk.Frame):
     def apply(self):
         path = self.path_var.get()
         try:
-            backup = core.apply(path, self._options())
+            backup = core.apply(path, self._collect_options())
         except core.UnsupportedBuild as e:
             messagebox.showerror(APP_TITLE, str(e))
             return
@@ -283,8 +283,8 @@ def main():
     if "--selftest" in sys.argv:
         root.update()
         # exercise the option round trip without touching any file
-        app._show(core.Options(120, True, "on", True, True, 1.2))
-        assert app._options() == core.Options(120, True, "on", True, True, 1.2), app._options()
+        app._show_options(core.Options(120, True, "on", True, True, 1.2))
+        assert app._collect_options() == core.Options(120, True, "on", True, True, 1.2), app._collect_options()
         root.destroy()
         return 0
     root.mainloop()
